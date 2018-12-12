@@ -22,6 +22,7 @@ class Session:
         self._session = requests.session()
         self._connection = sqlite3.connect(self._database_path)
         self._init_database()
+        self._last_response_use_cache = False
 
     def _insert_response(self, url, response):
         c = self._connection.cursor()
@@ -45,16 +46,17 @@ class Session:
         else:
             return getattr(self._session, name)
 
-    def _get(self, url, wait=0, use_cache=True, **kwargs):
+    def _get(self, url, use_cache=True, **kwargs):
         cached_response = self._get_response(url) if use_cache else None
         if cached_response:
             cached_response.from_cache = True
+            self._last_response_use_cache = True
             return cached_response
         else:
             response = self._session.get(url, **kwargs)
             response.from_cache = False
+            self._last_response_use_cache = False
             self._insert_response(url, response)
-            time.sleep(wait)
             return response
 
     def _serialize_response(self, response):
@@ -80,3 +82,7 @@ class Session:
                   "ORDER BY timestamp DESC", (url,))
         rows = c.fetchall()
         return [self._deserialize_response(r[0]) for r in rows]
+
+    def sleep(self, secs):
+        if not self._last_response_use_cache:
+            time.sleep(secs)

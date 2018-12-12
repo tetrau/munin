@@ -10,5 +10,5 @@ setuptools.setup(
     python_requires='>=3.5.0',
     install_requires=['requests>=2.0.0'],
     author_email='tetrau01@gmail.com',
-    description=''
+    description='requests session with persistence disk cache.'
 )
