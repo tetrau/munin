@@ -8,6 +8,8 @@ TEST_URL = "https://github.com/tetrau/munin"
 TEST_SIZE = (0, 100, 1000)
 response = requests.get(TEST_URL)
 
+print("web page size: {} KiB".format(len(response.content) // 1024))
+
 
 def display_config(c):
     s = []
@@ -16,8 +18,8 @@ def display_config(c):
     return ", ".join(s)
 
 
-for _config in itertools.product((True, False), repeat=1):
-    config = {"compress": _config[0]}
+for _config in itertools.product((True, False), repeat=2):
+    config = {"compress": _config[0], "index": _config[1]}
     session = munin.Session("test.db", **config)
     pickle_size = len(session._serialize_response(response))
     insert_timestamps = [time.time()]

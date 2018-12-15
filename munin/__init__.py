@@ -18,8 +18,13 @@ class Session:
                   "response BLOB\n"
                   ")\n")
         self._connection.commit()
+        if self._index:
+            c.execute("CREATE INDEX IF NOT EXISTS url_index "
+                      "ON responses (url);")
+            self._connection.commit()
 
-    def __init__(self, database, compress=True):
+    def __init__(self, database, compress=True, index=True):
+        self._index = index
         self._compress = compress
         self._database_path = database
         self._session = requests.session()
