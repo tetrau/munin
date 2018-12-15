@@ -19,8 +19,7 @@ class Session:
                   ")\n")
         self._connection.commit()
 
-    def __init__(self, database, compress=True, optimize=True):
-        self._optimize = optimize
+    def __init__(self, database, compress=True):
         self._compress = compress
         self._database_path = database
         self._session = requests.session()
@@ -65,8 +64,6 @@ class Session:
 
     def _serialize_response(self, response):
         pickled_response = pickle.dumps(response)
-        if self._optimize:
-            pickled_response = pickletools.optimize(pickled_response)
         if self._compress:
             return gzip.compress(pickled_response)
         else:

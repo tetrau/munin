@@ -16,8 +16,8 @@ def display_config(c):
     return ", ".join(s)
 
 
-for _config in itertools.product((True, False), repeat=2):
-    config = {"compress": _config[0], "optimize": _config[1]}
+for _config in itertools.product((True, False), repeat=1):
+    config = {"compress": _config[0]}
     session = munin.Session("test.db", **config)
     pickle_size = len(session._serialize_response(response))
     insert_timestamps = [time.time()]
