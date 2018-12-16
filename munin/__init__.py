@@ -3,7 +3,6 @@ import sqlite3
 import pickle
 import gzip
 import time
-import pickletools
 
 __version__ = "0.1.0"
 
@@ -26,7 +25,6 @@ class Session:
         c.execute("PRAGMA synchronous = OFF;")
         self._connection.commit()
 
-
     def __init__(self, database, compress=True, index=True):
         self._index = index
         self._compress = compress
@@ -34,7 +32,8 @@ class Session:
         self._session = requests.session()
         self._connection = sqlite3.connect(self._database_path)
         self._init_database()
-        self._last_response_use_cache = False
+        self._last_response_time = 0
+        self._last_response_use_cache = True
 
     def _insert_response(self, url, response):
         c = self._connection.cursor()
@@ -68,6 +67,7 @@ class Session:
             response = self._session.get(url, **kwargs)
             response.from_cache = False
             self._last_response_use_cache = False
+            self._last_response_time = time.time()
             self._insert_response(url, response)
             return response
 
@@ -97,4 +97,5 @@ class Session:
 
     def sleep(self, secs):
         if not self._last_response_use_cache:
-            time.sleep(secs)
+            time_now = time.time()
+            time.sleep(max(secs - (time_now - self._last_response_time), 0))
