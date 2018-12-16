@@ -18,10 +18,14 @@ class Session:
                   "response BLOB\n"
                   ")\n")
         self._connection.commit()
+
         if self._index:
             c.execute("CREATE INDEX IF NOT EXISTS url_index "
                       "ON responses (url);")
             self._connection.commit()
+        c.execute("PRAGMA synchronous = OFF;")
+        self._connection.commit()
+
 
     def __init__(self, database, compress=True, index=True):
         self._index = index
