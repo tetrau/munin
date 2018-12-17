@@ -60,7 +60,7 @@ class Session:
 
     def _get(self, url, use_cache=True, **kwargs):
         cached_response = self._get_response(url) if use_cache else None
-        if cached_response:
+        if cached_response is not None:
             cached_response.from_cache = True
             self._last_response_use_cache = True
             return cached_response
