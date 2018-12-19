@@ -3,35 +3,22 @@ import sqlite3
 import pickle
 import gzip
 import time
+from .sqlite3db import SQLite3Database
 
 __version__ = "0.1.1"
 
 
 class Session:
     def _init_database(self):
-        c = self._connection.cursor()
-        c.execute("CREATE TABLE IF NOT EXISTS responses ( \n"
-                  "id INTEGER PRIMARY KEY,\n"
-                  "timestamp REAL,\n"
-                  "url TEXT,\n"
-                  "response BLOB\n"
-                  ")\n")
-        self._connection.commit()
-        if self._index:
-            c.execute("CREATE INDEX IF NOT EXISTS url_index "
-                      "ON responses (url);")
-            self._connection.commit()
-        if not self._synchronous:
-            c.execute("PRAGMA synchronous = OFF;")
-            self._connection.commit()
+        self._database.init_database()
 
     def __init__(self, database, compress=True, index=True, synchronous=True):
         self._compress = compress
+        self._database = SQLite3Database(database, index, synchronous)
         self._index = index
         self._synchronous = synchronous
-        self._database_path = database
         self._session = requests.session()
-        self._connection = sqlite3.connect(self._database_path)
+        self._connection = sqlite3.connect(database)
         self._init_database()
         self._last_response_time = 0
         self._last_response_use_cache = True
