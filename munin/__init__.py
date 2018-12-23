@@ -23,21 +23,16 @@ class Session:
         self._last_response_time = 0
         self._last_response_use_cache = True
 
-    def _insert_response(self, url, response):
-        c = self._connection.cursor()
-        c.execute("INSERT INTO responses (timestamp, url, response) "
-                  "VALUES (?, ?, ?)", (time.time(), url, self._serialize_response(response)))
-        self._connection.commit()
+    def _put_response(self, url, response):
+        response = self._serialize_response(response)
+        self._database.put_response(url, response)
 
     def _get_response(self, url):
-        c = self._connection.cursor()
-        c.execute("SELECT response FROM responses WHERE url = ? "
-                  "ORDER BY timestamp DESC LIMIT 1", (url,))
-        row = c.fetchone()
-        if not row:
-            return None
+        response = self._database.get_response(url)
+        if response is None:
+            return response
         else:
-            return self._deserialize_response(row[0])
+            return self._deserialize_response(response)
 
     def __getattr__(self, name):
         if name == "get":
@@ -56,7 +51,7 @@ class Session:
             response.from_cache = False
             self._last_response_use_cache = False
             self._last_response_time = time.time()
-            self._insert_response(url, response)
+            self._put_response(url, response)
             return response
 
     def _serialize_response(self, response):
@@ -77,11 +72,8 @@ class Session:
         return self._get_response(url)
 
     def get_all_cached_response(self, url):
-        c = self._connection.cursor()
-        c.execute("SELECT response FROM responses WHERE url = ? "
-                  "ORDER BY timestamp DESC", (url,))
-        rows = c.fetchall()
-        return [self._deserialize_response(r[0]) for r in rows]
+        rows = self._database.get_many_response(url)
+        return [self._deserialize_response(r) for r in rows]
 
     def sleep(self, secs):
         if not self._last_response_use_cache:
