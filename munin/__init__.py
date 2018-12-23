@@ -9,17 +9,12 @@ __version__ = "0.2.0"
 
 
 class Session:
-    def _init_database(self):
-        self._database.init_database()
-
     def __init__(self, database, compress=True, index=True, synchronous=True):
         self._compress = compress
         self._database = SQLite3Database(database, index, synchronous)
         self._index = index
         self._synchronous = synchronous
         self._session = requests.session()
-        self._connection = sqlite3.connect(database)
-        self._init_database()
         self._last_response_time = 0
         self._last_response_use_cache = True
 

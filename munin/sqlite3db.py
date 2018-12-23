@@ -3,7 +3,7 @@ import time
 
 
 class SQLite3Database:
-    def init_database(self):
+    def _init_database(self):
         c = self._connection.cursor()
         c.execute("CREATE TABLE IF NOT EXISTS responses ( \n"
                   "id INTEGER PRIMARY KEY,\n"
@@ -24,6 +24,7 @@ class SQLite3Database:
         self._index = index
         self._synchronous = synchronous
         self._connection = sqlite3.connect(database)
+        self._init_database()
 
     def put_response(self, url, response):
         c = self._connection.cursor()
@@ -40,4 +41,3 @@ class SQLite3Database:
             return row
         else:
             return row[0]
-
