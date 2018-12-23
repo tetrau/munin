@@ -8,7 +8,7 @@ class SQLite3Database:
         c.execute("CREATE TABLE IF NOT EXISTS responses ( \n"
                   "id INTEGER PRIMARY KEY,\n"
                   "timestamp REAL,\n"
-                  "url TEXT,\n"
+                  "url TEXT UNIQUE,\n"
                   "response BLOB\n"
                   ")\n")
         self._connection.commit()
@@ -27,7 +27,7 @@ class SQLite3Database:
 
     def put_response(self, url, response):
         c = self._connection.cursor()
-        c.execute("INSERT INTO responses (timestamp, url, response) "
+        c.execute("INSERT OR REPLACE INTO responses (timestamp, url, response) "
                   "VALUES (?, ?, ?)", (time.time(), url, response))
         self._connection.commit()
 
@@ -41,8 +41,3 @@ class SQLite3Database:
         else:
             return row[0]
 
-    def get_many_responses(self, url):
-        c = self._connection.cursor()
-        c.execute("SELECT response FROM responses WHERE url = ?", (url,))
-        rows = c.fetchall()
-        return [r[0] for r in rows]

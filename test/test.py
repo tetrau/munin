@@ -30,12 +30,10 @@ class TestMunin(unittest.TestCase):
         cached_r = self.session.get_cached_response("https://www.example.com")
         self.assertEqual(cached_r.text, text)
 
-    def test_get_multi_cache(self):
+    def test_disable_cache(self):
         self.session.get("https://www.example.com")
         self.session.sleep(1)
         self.session.get("https://www.example.com", use_cache=False)
-        caches = self.session.get_all_cached_responses("https://www.example.com")
-        self.assertEqual(2, len(caches))
 
     def tearDown(self):
         self.session.close()
