@@ -20,15 +20,17 @@ def display_config(c):
     return ", ".join(s)
 
 
-for _config in itertools.product((True, False), repeat=2):
-    config = {"compress": _config[0], "index": _config[1]}
+configs = ("compress", "index", "synchronous")
+
+for _config in itertools.product((True, False), repeat=len(configs)):
+    config = dict(zip(configs, _config))
     session = munin.Session(TEST_DATABASE, **config)
     pickle_size = len(session._serialize_response(response))
     insert_timestamps = [time.time()]
     for idx, size in enumerate(TEST_SIZE[:-1]):
         next_size = TEST_SIZE[idx + 1]
         for i in range(size, next_size):
-            session._insert_response(TEST_URL + "/" + str(i), response)
+            session._put_response(TEST_URL + "/" + str(i), response)
         insert_timestamps.append(time.time())
     print("configuration:", display_config(config))
     for idx_1, size in enumerate(TEST_SIZE[1:]):
