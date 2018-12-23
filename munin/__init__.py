@@ -71,8 +71,8 @@ class Session:
     def get_cached_response(self, url):
         return self._get_response(url)
 
-    def get_all_cached_response(self, url):
-        rows = self._database.get_many_response(url)
+    def get_all_cached_responses(self, url):
+        rows = self._database.get_many_responses(url)
         return [self._deserialize_response(r) for r in rows]
 
     def sleep(self, secs):

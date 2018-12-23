@@ -34,7 +34,7 @@ class TestMunin(unittest.TestCase):
         self.session.get("https://www.example.com")
         self.session.sleep(1)
         self.session.get("https://www.example.com", use_cache=False)
-        caches = self.session.get_all_cached_response("https://www.example.com")
+        caches = self.session.get_all_cached_responses("https://www.example.com")
         self.assertEqual(2, len(caches))
 
     def tearDown(self):

@@ -41,7 +41,7 @@ class SQLite3Database:
         else:
             return row[0]
 
-    def get_many_response(self, url):
+    def get_many_responses(self, url):
         c = self._connection.cursor()
         c.execute("SELECT response FROM responses WHERE url = ?", (url,))
         rows = c.fetchall()
