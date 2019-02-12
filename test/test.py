@@ -37,3 +37,10 @@ class TestMunin(unittest.TestCase):
 
     def tearDown(self):
         self.session.close()
+
+    def test_delete_cache(self):
+        self.session.get("https://www.example.com")
+        self.session.sleep(1)
+        self.session.delete_cache("https://www.example.com")
+        r = self.session.get("https://www.example.com")
+        self.assertFalse(r.from_cache)

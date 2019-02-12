@@ -1,5 +1,4 @@
 import requests
-import sqlite3
 import pickle
 import gzip
 import time
@@ -62,6 +61,9 @@ class Session:
         else:
             pickled_response = s_response
         return pickle.loads(pickled_response)
+
+    def delete_cache(self, url):
+        self._database.delete_response(url)
 
     def get_cached_response(self, url):
         return self._get_response(url)

@@ -41,3 +41,8 @@ class SQLite3Database:
             return row
         else:
             return row[0]
+
+    def delete_response(self, url):
+        c = self._connection.cursor()
+        c.execute("DELETE FROM responses WHERE url = ?", (url,))
+        self._connection.commit()
