@@ -1,5 +1,4 @@
 import requests
-import sqlite3
 import pickle
 import gzip
 import time
@@ -9,17 +8,12 @@ __version__ = "0.3.0"
 
 
 class Session:
-    def _init_database(self):
-        self._database.init_database()
-
     def __init__(self, database, compress=True, index=True, synchronous=True):
         self._compress = compress
         self._database = SQLite3Database(database, index, synchronous)
         self._index = index
         self._synchronous = synchronous
         self._session = requests.session()
-        self._connection = sqlite3.connect(database)
-        self._init_database()
         self._last_response_time = 0
         self._last_response_use_cache = True
 
@@ -68,12 +62,11 @@ class Session:
             pickled_response = s_response
         return pickle.loads(pickled_response)
 
+    def delete_cache(self, url):
+        self._database.delete_response(url)
+
     def get_cached_response(self, url):
         return self._get_response(url)
-
-    def get_all_cached_responses(self, url):
-        rows = self._database.get_many_responses(url)
-        return [self._deserialize_response(r) for r in rows]
 
     def sleep(self, secs):
         if not self._last_response_use_cache:
